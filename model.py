@@ -40,26 +40,25 @@ class SiameseNetwork(nn.Module):
     def __init__(self):
         super(SiameseNetwork, self).__init__()
         self.conv = nn.Sequential(
-            nn.Conv2d(1, 64, kernel_size=10, stride=1, padding=1),  # Assuming input is 1x256x256
+            nn.Conv2d(1, 64, kernel_size=10, stride=1, padding=1), 
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),  # Output size: 64x124x124
+            nn.MaxPool2d(2, stride=2), 
 
             nn.Conv2d(64, 128, kernel_size=7, stride=1, padding=1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),  # Output size: 128x60x60
+            nn.MaxPool2d(2, stride=2), 
 
-            nn.Conv2d(128, 256, kernel_size=4, stride=1, padding=1),
+            nn.Conv2d(128, 128, kernel_size=4, stride=1, padding=1),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, stride=2),  # Output size: 256x30x30
+            nn.MaxPool2d(2, stride=2), 
 
-            nn.Conv2d(256, 128, kernel_size=3, padding=1, stride=1),
+            nn.Conv2d(128, 256, kernel_size=4, padding=1, stride=1),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(128),
-            nn.MaxPool2d(2, stride=2),  # Output size: 512*5*5
+            # nn.BatchNorm2d(128),
 
-            nn.Flatten(),  # Flattened output size: 512*15*15 = 115200
+            nn.Flatten(),  
 
-            nn.Linear(3200, 1024),  # Correct size
+            nn.Linear(20736, 4096),  
             nn.ReLU(inplace=True),
         )
     def forward_once(self, x):
@@ -141,13 +140,6 @@ def train_model(model, device, train_loader,test_loader, epochs,lr=0.0001, lambd
             running_loss += loss.item()
             predictions_train.extend(probabilities.detach().numpy())
             true_labels_train.extend(labels.detach().numpy())
-
-            if batch_idx % 100 == 0:
-                current_loss = running_loss / (batch_idx + 1)
-                auc_score = roc_auc_score(true_labels_train, predictions_train)
-                print(f'Train Epoch: {epoch+1} [{batch_idx * len(data1)}/{len(train_loader.dataset)} ({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}, Train AUC: {auc_score:.2f}')
-
-
 
         epoch_loss = running_loss / len(train_loader)
         auc_score = roc_auc_score(true_labels_train, predictions_train)
