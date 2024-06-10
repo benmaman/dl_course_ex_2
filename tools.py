@@ -2,8 +2,8 @@ from torch.utils.data import Dataset
 from PIL import Image
 import os
 import torch
-
-
+import random
+import numpy as np
 def parse_data(lines):
     pairs = []
     for line in lines:
@@ -14,6 +14,9 @@ def parse_data(lines):
         elif len(parts) == 4:
             # Negative pair: (person1, img1, person2, img2)
             pairs.append((parts[0], parts[2], int(parts[1]), int(parts[3]), 0))
+        
+    random.shuffle(pairs)
+
     return pairs
 
 
